@@ -73,14 +73,62 @@
   (let [pos (reduce process-cmd-b {:hpos 0 :depth 0 :aim 0} cmds)]
     (* (:hpos pos) (:depth pos))))
 
+;;                                      ;;
+;; Day 3 - Processing Power Consumption ;;
+;;                                      ;;
+
+;; map "00110" => (0 0 1 1 0)
+(defn bitstr-to-bitvec [input]
+  (map #(Integer/parseInt %1) (str/split input #"")))
+
+;; update counts of 1 bits in each position and the total number of inputs processed
+(defn update-occurances [totals input]
+  (let [n (+ 1 (:nitems totals))
+        c (map + (:counts totals) (bitstr-to-bitvec input))
+        b (count c)]
+    {:nitems n :counts c :nbits b}))
+
+;; Sets the given gamma bit if 1 is the most frequent bit
+(defn gamma-bit [nset ntotal]
+  (if (> nset (int (/ ntotal 2))) 1 0))
+
+;; Calculate gamma bits for all positions
+(defn gamma-bits [nsetlist ntotal]
+  (for [nset nsetlist]
+    (gamma-bit nset ntotal)))
+
+;; Calc gamma bit vec and convert it to an integer
+(defn gamma [nsetlist ntotal]
+  (Integer/parseInt 
+   (apply str (map str (gamma-bits nsetlist ntotal))) 2))
+
+;; Derive epsilon from gamma (it will always be e==2^nbits-1-g because its an n bit num and e == ~g)
+(defn epsilon [gamma nbits]
+  (- (bit-shift-left 1 nbits) 1 gamma))
+
+;; Count the numbers of each bit position set on each line
+(defn count-occurances [lines]
+  (reduce update-occurances {:counts (repeat 0) :nitems 0 :nbits 0} lines))
+
+;; Using the method above, calculate gamma*epsilon
+(defn calculate-power [lines]
+  (let
+      [o (count-occurances lines)
+       g (gamma (:counts o) (:nitems o))
+       e (epsilon g (:nbits o))]
+    (println o)
+    (* g e)))
+
 ;;                                                         ;;
 ;; Main - Check your work against the provided inputs here ;;
 ;;                                                         ;;
 
 (defn -main [& args]
-  (case (first args)
-    "1a" (println (detect-increases (parse-int-lines (read-all-lines))))
-    "1b" (println (detect-increases (take-3groups-and-sum (parse-int-lines read-all-lines))))
-    "2a" (println (process-cmds (parse-cmd-lines (read-all-lines))))
-    "2b" (println (process-cmds-b (parse-cmd-lines (read-all-lines))))))
+  (println
+   (case (first args)
+     "1a" (detect-increases (parse-int-lines (read-all-lines)))
+     "1b" (detect-increases (take-3groups-and-sum (parse-int-lines read-all-lines)))
+     "2a" (process-cmds (parse-cmd-lines (read-all-lines)))
+     "2b" (process-cmds-b (parse-cmd-lines (read-all-lines)))
+     "3a" (calculate-power (read-all-lines)))))
 
