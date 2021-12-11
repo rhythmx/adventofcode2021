@@ -3,5 +3,22 @@ name = "day8"
 version = "0.1.0"
 edition = "2021"
 
+
+[[bin]]
+name = "day8a"
+path = "src/day8a.rs"
+
+[[bin]]
+name = "day8b"
+path = "src/day8b.rs"
+
+[[bin]]
+name = "day9a"
+path = "src/day9a.rs"
+
+[[bin]]
+name = "day9b"
+path = "src/day9b.rs"
+
 [dependencies]
 regex = "1.5"
